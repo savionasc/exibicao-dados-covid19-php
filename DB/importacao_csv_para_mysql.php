@@ -1,14 +1,28 @@
 <?php  
 //$connect = mysqli_connect("localhost", "root", "", "test");
-if(isset($_POST["submit"])){
+$user = 'root';
+$password = '';
+
+if(isset($_POST["limpar_banco"]) == "LimparBanco"){
+  try {
+    $pdo = new PDO('mysql:host=localhost:3306;dbname=comp_urbana', $user, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+     
+    $stmt = $pdo->prepare('TRUNCATE TABLE dados_covid1');
+    //$stmt->bindParam(':id', $id); 
+    $stmt->execute();
+       
+    echo "Apagado com sucesso, agora a tabela tem ".$stmt->rowCount()." linhas."; 
+  } catch(PDOException $e) {
+    echo 'Erro ao deletar: ' . $e->getMessage();
+  }
+}else if(isset($_POST["submit"])){
  if($_FILES['file']['name']){
   $filename = explode(".", $_FILES['file']['name']);
   if($filename[1] == 'csv'){
    $handle = fopen($_FILES['file']['tmp_name'], "r");
    while($data = fgetcsv($handle)){
     try {
-      $user = 'root';
-      $password = '';
       $pdo = new PDO('mysql:host=localhost:3306;dbname=comp_urbana', $user, $password);
       $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
        
@@ -64,7 +78,10 @@ if(isset($_POST["submit"])){
     <input type="file" name="file" />
     <br />
     <input type="submit" name="submit" value="Import" class="btn btn-info" />
+    <input type="submit" name="limpar_banco" value="LimparBanco" class="btn btn-info" />
    </div>
   </form>
+
+  
  </body>  
 </html>
