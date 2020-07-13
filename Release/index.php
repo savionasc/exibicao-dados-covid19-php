@@ -13,9 +13,9 @@
 ?>
 <html>
     <head>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-        <script type="text/javascript">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> <!-- do select -->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> <!-- do gráfico -->
+        <script type="text/javascript"> //do gráfico
             google.charts.load('current', {'packages':['corechart']});
             google.charts.setOnLoadCallback(drawChart);
 
@@ -48,7 +48,7 @@
         </script>
     </head>
     <body>
-        <script>
+        <script> //do select
             $(document).ready(function(){
                 $('#estado').on('change', function(){
                     var estado = $(this).val();
@@ -68,7 +68,8 @@
             });
         </script>
         <div id="graficoLinha" style="width: 900px; height: 500px;"></div>
-
+        <p><b>Descrição:</b></p>
+        <p>Neste gráfico, é possível visualizar... Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de casos confirmados de COVID19.</p>
         <select id="estado">
             <option value="">Selecione o estado</option>
             <?php 
@@ -82,7 +83,6 @@
             ?>
         </select>
 
-        <!-- State dropdown -->
         <select id="state" onchange="window.location.href = ('./?p='+state.value)">
             <option value="">Primeiro escolha um estado</option>
         </select>
