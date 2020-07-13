@@ -21,7 +21,7 @@
     <meta name="author" content="">
     <!-- <link rel="icon" href="favicon.ico"> -->
 
-    <title>Dashboard Template for Bootstrap</title>
+    <title>Análises COVID-19</title>
 
     <!-- Bootstrap core CSS -->
     <link href="./bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -82,7 +82,7 @@
               <li class="nav-item">
                 <a class="nav-link" href="#inicio">
                   <span data-feather="home"></span>
-                  Dashboard <span class="sr-only">(current)</span>
+                  Inicio <span class="sr-only">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
@@ -136,17 +136,17 @@
 
         <main role="main" id="inicio" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Dashboard</h1>
-            <div class="btn-toolbar mb-2 mb-md-0">
-              <div class="btn-group mr-2">
+            <h1 class="h2">Inicio</h1>
+            <!--<div class="btn-toolbar mb-2 mb-md-0">
+               <div class="btn-group mr-2">
                 <button class="btn btn-sm btn-outline-secondary">Share</button>
                 <button class="btn btn-sm btn-outline-secondary">Export</button>
-              </div>
+              </div> 
               <button class="btn btn-sm btn-outline-secondary dropdown-toggle">
                 <span data-feather="calendar"></span>
                 This week
               </button>
-            </div>
+            </div>-->
           </div>
 
           <p>Introdução do artigo</p><br /><br /><br /><br /><br /><br /><br /><br />
