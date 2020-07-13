@@ -1,19 +1,5 @@
 <!doctype html>
-<?php
-    include 'conexao.php';
-
-    $passou = false;
-
-    if(isset($_GET['p'])){
-        $valor = $_GET["p"];
-        $passou = true;
-    }
-
-    $query = "SELECT * FROM lista_cidade_estado WHERE tipo = 'state'  ORDER BY cidade ASC"; 
-    $result = $conexao->query($query); 
-?>
-
-<html lang="pt">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -28,45 +14,12 @@
 
     <!-- Custom styles for this template -->
     <link href="./bootstrap/dashboard.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> <!-- do select -->
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> <!-- do gráfico -->
-    <script type="text/javascript"> //do gráfico
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
-
-        function drawChart() {
-            var data = google.visualization.arrayToDataTable([
-                ['Cidade', 'Casos'],
-                <?php
-                $sql = "SELECT * FROM dados_covid19 where city_ibge_code = ";
-                $sql .= (($passou) ? $valor : 3550308);
-                $buscar = mysqli_query($conexao,$sql);
-
-                while($dados = mysqli_fetch_array($buscar)){
-                    $cidade = $dados['date'];
-                    $casos = $dados['last_available_confirmed'];
-                    $nomeCidade = $dados['city'];
-                ?>
-                ['<?php echo $cidade ?>', <?php echo $casos ?>],
-
-                <?php } ?>
-            ]);
-            
-            var options = {
-                title: 'Número de casos de covid19 na cidade de <?php echo $nomeCidade ?>',
-                legend: {position: 'right'}
-            };
-
-            var chart = new google.visualization.LineChart(document.getElementById('graficoLinha'));
-            chart.draw(data, options);
-        }
-    </script>
   </head>
 
   <body>
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
-      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Análises COVID-19</a>
-      <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
+      <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Company name</a>
+      <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
       <ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
           <a class="nav-link" href="#">Sign out</a>
@@ -80,7 +33,7 @@
           <div class="sidebar-sticky">
             <ul class="nav flex-column">
               <li class="nav-item">
-                <a class="nav-link" href="#inicio">
+                <a class="nav-link active" href="#">
                   <span data-feather="home"></span>
                   Dashboard <span class="sr-only">(current)</span>
                 </a>
@@ -125,16 +78,34 @@
             </h6>
             <ul class="nav flex-column mb-2">
               <li class="nav-item">
-                <a class="nav-link" href="#secao2">
+                <a class="nav-link" href="#">
                   <span data-feather="file-text"></span>
                   Current month
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  Last quarter
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  Social engagement
+                </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">
+                  <span data-feather="file-text"></span>
+                  Year-end sale
                 </a>
               </li>
             </ul>
           </div>
         </nav>
 
-        <main role="main" id="inicio" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
             <h1 class="h2">Dashboard</h1>
             <div class="btn-toolbar mb-2 mb-md-0">
@@ -149,37 +120,9 @@
             </div>
           </div>
 
-          <p>Introdução do artigo</p><br /><br /><br /><br /><br /><br /><br /><br />
-          <div id="graficoLinha" style="width: 900px; height: 500px;"></div>
-          <p><b>Descrição:</b></p>
-          <p>Neste gráfico, é possível visualizar... Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de casos confirmados de COVID19.</p>
-          <select id="estado">
-              <option value="">Selecione o estado</option>
-                <?php 
-                if($result->num_rows > 0){ 
-                    while($row = $result->fetch_assoc()){  
-                        echo '<option value="'.$row['cidade'].'">'.$row['cidade'].'</option>'; 
-                    } 
-                }else{ 
-                    echo '<option value="">Estado não disponível</option>'; 
-                } 
-                ?>
-          </select>
+          <canvas class="my-4" id="myChart" width="900" height="380"></canvas>
 
-          <select id="state" onchange="window.location.href = ('./?p='+state.value)">
-              <option value="">Primeiro escolha um estado</option>
-          </select>
-
-          <ul>
-              <li><a href="./?p=3550308">São Paulo</a></li>
-              <li><a href="./?p=2910800">Feira de Santana</a></li>
-              <li><a href="./?p=3300407">Barra Mansa:</a> </li>
-              <li><a href="./?p=2311306">Quixadá</a></li>
-              <li><a href="./?p=2304400">Fortaleza:</a> </li>
-          </ul>
-
-          
-          <h2 id="secao2">Section title</h2>
+          <h2>Section title</h2>
           <div class="table-responsive">
             <table class="table table-striped table-sm">
               <thead>
@@ -314,9 +257,9 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>window.jQuery || document.write('<script src="./bootstrap/jquery-3.5.1.js"><\/script>')</script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script>window.jQuery || document.write('<script src="./bootstrap/jquery-slim.min.js"><\/script>')</script>
+    <script src="./bootstrap/popper.min.js"></script>
     <script src="./bootstrap/bootstrap.min.js"></script>
 
     <!-- Icons -->
@@ -325,24 +268,36 @@
       feather.replace()
     </script>
 
-    <script> //do select
-            $(document).ready(function(){
-                $('#estado').on('change', function(){
-                    var estado = $(this).val();
-                    if(estado){
-                        $.ajax({
-                            type:'POST',
-                            url:'ajaxDataCidades.php',
-                            data:'estado='+estado,
-                            success:function(html){
-                                $('#state').html(html);
-                            }
-                        }); 
-                    }else{
-                        $('#state').html('<option value="">Select estado first</option>');
-                    }
-                });
-            });
-        </script>
+    <!-- Graphs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
+    <script>
+      var ctx = document.getElementById("myChart");
+      var myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          datasets: [{
+            data: [15339, 21345, 18483, 24003, 23489, 24092, 12034],
+            lineTension: 0,
+            backgroundColor: 'transparent',
+            borderColor: '#007bff',
+            borderWidth: 4,
+            pointBackgroundColor: '#007bff'
+          }]
+        },
+        options: {
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: false
+              }
+            }]
+          },
+          legend: {
+            display: false,
+          }
+        }
+      });
+    </script>
   </body>
 </html>
