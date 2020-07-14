@@ -208,11 +208,11 @@
             <table class="table table-striped table-sm">
               <thead>
                 <tr>
-                  <th>Posição no país</th>
-                  <th>Posição por Nº de mortes</th>
                   <th>Estado</th>
                   <th>Casos</th>
                   <th>Mortes</th>
+                  <th>Posição no país por Nº de casos</th>
+                  <th>Posição no país por Nº de mortes</th>
                 </tr>
               </thead>
               <tbody>
@@ -233,21 +233,21 @@
                     $last_available_deaths = $dados['last_available_deaths'];
                 ?>
                 <tr>
-                  <td><?php echo $posicao; ?>º</td>
-                  <td><?php echo $posicao_mortes; ?>º</td>
                   <td><?php echo $city; ?></td>
                   <td><?php echo $last_available_confirmed; ?></td>
                   <td><?php echo $last_available_deaths; ?></td>
+                  <td><?php echo $posicao; ?>º</td>
+                  <td><?php echo $posicao_mortes; ?>º</td>
                 </tr>
                 <?php } }?>
               </tbody>
               <thead>
                 <tr>
-                  <th>Posição por Nº de casos</th>
-                  <th>Posição por Nº de mortes</th>
                   <th>Cidade</th>
                   <th>Casos</th>
                   <th>Mortes</th>
+                  <th>Posição no estado por Nº de casos</th>
+                  <th>Posição no estado por Nº de mortes</th>
                 </tr>
               </thead>
               <tbody>
@@ -268,11 +268,11 @@
                         $last_available_deaths = $dados['last_available_deaths'];
                 ?>
                 <tr>
-                  <td><?php echo $posicao?>º</td>
-                  <td><?php echo $posicao_mortes?>º</td>
                   <td><b><?php echo $city ?></b></td>
                   <td><?php echo $last_available_confirmed?></td>
                   <td><?php echo $last_available_deaths?></td>
+                  <td><?php echo $posicao?>º</td>
+                  <td><?php echo $posicao_mortes?>º</td>
                 </tr>
                 
                 <?php } $ct++; } ?>
