@@ -145,7 +145,7 @@
           </div> -->
           <div class="jumbotron">
               <!--<p>Introdução do artigo</p><br /><br /><br /><br /><br /><br /><br /><br /> -->
-              <center><div id="graficoLinha" style="width: 900px; height: 500px;"></div></center>
+              <center><div id="graficoLinha" style="width: 90%; height: 500px;"></div></center>
           </div>
           <p><b>Descrição:</b></p>
           <p>Neste gráfico, é possível visualizar... Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de casos confirmados de COVID19.</p>
@@ -209,6 +209,7 @@
               <thead>
                 <tr>
                   <th>Posição no país</th>
+                  <th>Posição por Nº de mortes</th>
                   <th>Estado</th>
                   <th>Casos</th>
                   <th>Mortes</th>
@@ -216,7 +217,7 @@
               </thead>
               <tbody>
                 <?php
-                $sql = "SELECT DISTINCT `city_ibge_code`, ROW_NUMBER() OVER (ORDER BY `last_available_confirmed` DESC) contagem_linha, `city`, `last_available_confirmed`, `last_available_deaths` FROM `dados_covid19` WHERE `date` IN (SELECT max(`date`) FROM `dados_covid19`) and `place_type` = 'state' ORDER BY `last_available_confirmed` DESC";
+                $sql = "SELECT DISTINCT `city_ibge_code`, ROW_NUMBER() OVER (ORDER BY `last_available_confirmed` DESC) contagem_linha, ROW_NUMBER() OVER (ORDER BY `last_available_deaths` DESC) contagem_linha_mortes, `city`, `last_available_confirmed`, `last_available_deaths` FROM `dados_covid19` WHERE `date` IN (SELECT max(`date`) FROM `dados_covid19`) and `place_type` = 'state' ORDER BY `last_available_confirmed` DESC";
                 
                 $buscar = mysqli_query($conexao,$sql);
 
@@ -228,10 +229,12 @@
                     $city = $dados['city'];
                     $last_available_confirmed = $dados['last_available_confirmed'];
                     $posicao = $dados['contagem_linha'];
+                    $posicao_mortes = $dados['contagem_linha_mortes'];
                     $last_available_deaths = $dados['last_available_deaths'];
                 ?>
                 <tr>
                   <td><?php echo $posicao; ?>º</td>
+                  <td><?php echo $posicao_mortes; ?>º</td>
                   <td><?php echo $city; ?></td>
                   <td><?php echo $last_available_confirmed; ?></td>
                   <td><?php echo $last_available_deaths; ?></td>
@@ -240,7 +243,8 @@
               </tbody>
               <thead>
                 <tr>
-                  <th>Posição no estado</th>
+                  <th>Posição por Nº de casos</th>
+                  <th>Posição por Nº de mortes</th>
                   <th>Cidade</th>
                   <th>Casos</th>
                   <th>Mortes</th>
@@ -249,7 +253,7 @@
               <tbody>
                 <?php
 
-                $sql = "SELECT DISTINCT `city_ibge_code`, ROW_NUMBER() OVER (ORDER BY `last_available_confirmed` DESC) contagem_linha, `city`, `last_available_confirmed`, `last_available_deaths` FROM `dados_covid19` WHERE `date` IN (SELECT max(`date`) FROM `dados_covid19`) and state = '".$est."' and `place_type` = 'city' ORDER BY `last_available_confirmed` DESC";
+                $sql = "SELECT DISTINCT `city_ibge_code`, ROW_NUMBER() OVER (ORDER BY `last_available_confirmed` DESC) contagem_linha, ROW_NUMBER() OVER (ORDER BY `last_available_deaths` DESC) contagem_linha_mortes, `city`, `last_available_confirmed`, `last_available_deaths` FROM `dados_covid19` WHERE `date` IN (SELECT max(`date`) FROM `dados_covid19`) and state = '".$est."' and `place_type` = 'city' ORDER BY `last_available_confirmed` DESC";
                 
                 $buscar = mysqli_query($conexao,$sql);
 
@@ -260,16 +264,17 @@
                         $city = $dados['city'];
                         $last_available_confirmed = $dados['last_available_confirmed'];
                         $posicao = $dados['contagem_linha'];
+                        $posicao_mortes = $dados['contagem_linha_mortes'];
                         $last_available_deaths = $dados['last_available_deaths'];
                 ?>
                 <tr>
                   <td><?php echo $posicao?>º</td>
+                  <td><?php echo $posicao_mortes?>º</td>
                   <td><b><?php echo $city ?></b></td>
                   <td><?php echo $last_available_confirmed?></td>
                   <td><?php echo $last_available_deaths?></td>
                 </tr>
                 
-
                 <?php } $ct++; } ?>
               </tbody>
             </table>
