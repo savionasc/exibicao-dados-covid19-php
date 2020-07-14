@@ -146,7 +146,7 @@
           <div class="jumbotron">
               <!--<p>Introdução do artigo</p><br /><br /><br /><br /><br /><br /><br /><br /> -->
               <center><div id="graficoLinha" style="width: 900px; height: 500px;"></div></center>
-            </div>
+          </div>
           <p><b>Descrição:</b></p>
           <p>Neste gráfico, é possível visualizar... Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de casos confirmados de COVID19.</p>
           <select id="estado">
@@ -166,6 +166,35 @@
               <option value="">Primeiro escolha um estado</option>
           </select>
           <br /><br />
+          <div class="row">
+            <div class="jumbotron col-md-4 offset-md-1 bg-info text-white link-white">
+                <p><b>Veja também - cidades do estado</b></p>
+                <ul>
+                  <?php
+                    $sql = "SELECT `cidade`, `cod_cidade`, `estado`  FROM lista_cidade_estado where estado = '".$est."' and tipo = 'city' ORDER BY RAND() LIMIT 5";
+                    $buscar = mysqli_query($conexao,$sql);
+                    while($dados = mysqli_fetch_array($buscar)){
+                    ?>
+                    <li>
+                        <a class="text-white" href="./?p=<?php echo $dados['cod_cidade']?>"><?php echo $dados['cidade']; ?> (<?php echo $dados['estado']; ?>)
+                        </a>
+                    </li>
+                  <?php } ?>
+                </ul>
+            </div>
+            <div class="jumbotron col-md-4 offset-md-1 bg-info text-white link-white">
+              <p><b>Veja também - cidades do país</b></p>
+              <ul>
+              <?php
+                $sql = "SELECT `cidade`, `cod_cidade`, `estado`  FROM lista_cidade_estado where tipo = 'city' ORDER BY RAND() LIMIT 5";
+                $buscar = mysqli_query($conexao,$sql);
+                while($dados = mysqli_fetch_array($buscar)){
+                ?>
+                <li><a class="text-white" href="./?p=<?php echo $dados['cod_cidade']?>"><?php echo $dados['cidade']; ?> (<?php echo $dados['estado']; ?>)</a></li>
+                <?php } ?>
+              </ul>
+            </div>
+          </div>
           <!-- <ul>
               <li><a href="./?p=3550308">São Paulo</a></li>
               <li><a href="./?p=2910800">Feira de Santana</a></li>

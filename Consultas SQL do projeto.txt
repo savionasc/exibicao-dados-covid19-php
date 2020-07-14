@@ -21,3 +21,6 @@ Colocando nome nos estados
 UPDATE `dados_covid19` SET `city` = `state` WHERE `place_type` = "state";
 
 UPDATE `dados_covid19` SET `city` = 'Pará' WHERE `place_type` = "state" AND `city` = 'PA';
+
+Selecionando 5 cidades aleatórias
+SELECT `cidade` FROM lista_cidade_estado ORDER BY RAND() LIMIT 5
