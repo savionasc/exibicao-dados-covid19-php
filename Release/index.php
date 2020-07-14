@@ -3,7 +3,8 @@
     include 'conexao.php';
 
     $passou = false;
-
+    $est = "SP";
+    $valor = 3550308;
     if(isset($_GET['p'])){
         $valor = $_GET["p"];
         $passou = true;
@@ -46,6 +47,7 @@
                     $cidade = $dados['date'];
                     $casos = $dados['last_available_confirmed'];
                     $nomeCidade = $dados['city'];
+                    $est = $dados['state'];
                 ?>
                 ['<?php echo $cidade ?>', <?php echo $casos ?>],
 
@@ -67,11 +69,11 @@
     <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
       <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#">Análises COVID-19</a>
       <!-- <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search"> -->
-      <ul class="navbar-nav px-3">
+      <!--<ul class="navbar-nav px-3">
         <li class="nav-item text-nowrap">
           <a class="nav-link" href="#">Sign out</a>
         </li>
-      </ul>
+      </ul>-->
     </nav>
 
     <div class="container-fluid">
@@ -85,36 +87,24 @@
                   Inicio <span class="sr-only">(current)</span>
                 </a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="file"></span>
-                  Orders
-                </a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">
-                  <span data-feather="shopping-cart"></span>
-                  Products
-                </a>
-              </li>
-              <li class="nav-item">
+              <!--<li class="nav-item">
                 <a class="nav-link" href="#">
                   <span data-feather="users"></span>
                   Customers
                 </a>
-              </li>
+              </li>-->
               <li class="nav-item">
                 <a class="nav-link" href="#">
                   <span data-feather="bar-chart-2"></span>
-                  Reports
+                  Graficos
                 </a>
               </li>
-              <li class="nav-item">
+              <!--<li class="nav-item">
                 <a class="nav-link" href="#">
                   <span data-feather="layers"></span>
                   Integrations
                 </a>
-              </li>
+              </li>-->
             </ul>
 
             <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
@@ -148,9 +138,15 @@
               </button>
             </div>-->
           </div>
-
-          <p>Introdução do artigo</p><br /><br /><br /><br /><br /><br /><br /><br />
-          <div id="graficoLinha" style="width: 900px; height: 500px;"></div>
+          <!-- <div class="jumbotron">
+                <h1>Navbar example</h1>
+                <p class="lead">This example is a quick exercise to illustrate how fixed to top navbar works. As you scroll, it will remain fixed to the top of your browser's viewport.</p>
+                <a class="btn btn-lg btn-primary" href="../../components/navbar/" role="button">View navbar docs &raquo;</a>
+          </div> -->
+          <div class="jumbotron">
+              <!--<p>Introdução do artigo</p><br /><br /><br /><br /><br /><br /><br /><br /> -->
+              <center><div id="graficoLinha" style="width: 900px; height: 500px;"></div></center>
+            </div>
           <p><b>Descrição:</b></p>
           <p>Neste gráfico, é possível visualizar... Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de casos confirmados de COVID19.</p>
           <select id="estado">
@@ -158,7 +154,7 @@
                 <?php 
                 if($result->num_rows > 0){ 
                     while($row = $result->fetch_assoc()){  
-                        echo '<option value="'.$row['cidade'].'">'.$row['cidade'].'</option>'; 
+                        echo '<option value="'.$row['estado'].'">'.$row['cidade'].'</option>'; 
                     } 
                 }else{ 
                     echo '<option value="">Estado não disponível</option>'; 
@@ -169,141 +165,83 @@
           <select id="state" onchange="window.location.href = ('./?p='+state.value)">
               <option value="">Primeiro escolha um estado</option>
           </select>
-
-          <ul>
+          <br /><br />
+          <!-- <ul>
               <li><a href="./?p=3550308">São Paulo</a></li>
               <li><a href="./?p=2910800">Feira de Santana</a></li>
               <li><a href="./?p=3300407">Barra Mansa:</a> </li>
               <li><a href="./?p=2311306">Quixadá</a></li>
               <li><a href="./?p=2304400">Fortaleza:</a> </li>
-          </ul>
-
-          
-          <h2 id="secao2">Section title</h2>
+          </ul> -->
+         
+          <h2 id="secao2">Cidades com mais casos do estado</h2>
           <div class="table-responsive">
             <table class="table table-striped table-sm">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
-                  <th>Header</th>
+                  <th>Posição no país</th>
+                  <th>Estado</th>
+                  <th>Casos</th>
+                  <th>Mortes</th>
                 </tr>
               </thead>
               <tbody>
+                <?php
+                $sql = "SELECT DISTINCT `city_ibge_code`, ROW_NUMBER() OVER (ORDER BY `last_available_confirmed` DESC) contagem_linha, `city`, `last_available_confirmed`, `last_available_deaths` FROM `dados_covid19` WHERE `date` IN (SELECT max(`date`) FROM `dados_covid19`) and `place_type` = 'state' ORDER BY `last_available_confirmed` DESC";
+                
+                $buscar = mysqli_query($conexao,$sql);
+
+                $ct = 0;
+
+                while($dados = mysqli_fetch_array($buscar)){
+                    if($dados['city'] == $est){
+
+                    $city = $dados['city'];
+                    $last_available_confirmed = $dados['last_available_confirmed'];
+                    $posicao = $dados['contagem_linha'];
+                    $last_available_deaths = $dados['last_available_deaths'];
+                ?>
                 <tr>
-                  <td>1,001</td>
-                  <td>Lorem</td>
-                  <td>ipsum</td>
-                  <td>dolor</td>
-                  <td>sit</td>
+                  <td><?php echo $posicao; ?>º</td>
+                  <td><?php echo $city; ?></td>
+                  <td><?php echo $last_available_confirmed; ?></td>
+                  <td><?php echo $last_available_deaths; ?></td>
                 </tr>
+                <?php } }?>
+              </tbody>
+              <thead>
                 <tr>
-                  <td>1,002</td>
-                  <td>amet</td>
-                  <td>consectetur</td>
-                  <td>adipiscing</td>
-                  <td>elit</td>
+                  <th>Posição no estado</th>
+                  <th>Cidade</th>
+                  <th>Casos</th>
+                  <th>Mortes</th>
                 </tr>
+              </thead>
+              <tbody>
+                <?php
+
+                $sql = "SELECT DISTINCT `city_ibge_code`, ROW_NUMBER() OVER (ORDER BY `last_available_confirmed` DESC) contagem_linha, `city`, `last_available_confirmed`, `last_available_deaths` FROM `dados_covid19` WHERE `date` IN (SELECT max(`date`) FROM `dados_covid19`) and state = '".$est."' and `place_type` = 'city' ORDER BY `last_available_confirmed` DESC";
+                
+                $buscar = mysqli_query($conexao,$sql);
+
+                $ct = 0;
+
+                while($dados = mysqli_fetch_array($buscar)){
+                    if($ct < 10 || $dados['city_ibge_code'] == $valor){
+                        $city = $dados['city'];
+                        $last_available_confirmed = $dados['last_available_confirmed'];
+                        $posicao = $dados['contagem_linha'];
+                        $last_available_deaths = $dados['last_available_deaths'];
+                ?>
                 <tr>
-                  <td>1,003</td>
-                  <td>Integer</td>
-                  <td>nec</td>
-                  <td>odio</td>
-                  <td>Praesent</td>
+                  <td><?php echo $posicao?>º</td>
+                  <td><b><?php echo $city ?></b></td>
+                  <td><?php echo $last_available_confirmed?></td>
+                  <td><?php echo $last_available_deaths?></td>
                 </tr>
-                <tr>
-                  <td>1,003</td>
-                  <td>libero</td>
-                  <td>Sed</td>
-                  <td>cursus</td>
-                  <td>ante</td>
-                </tr>
-                <tr>
-                  <td>1,004</td>
-                  <td>dapibus</td>
-                  <td>diam</td>
-                  <td>Sed</td>
-                  <td>nisi</td>
-                </tr>
-                <tr>
-                  <td>1,005</td>
-                  <td>Nulla</td>
-                  <td>quis</td>
-                  <td>sem</td>
-                  <td>at</td>
-                </tr>
-                <tr>
-                  <td>1,006</td>
-                  <td>nibh</td>
-                  <td>elementum</td>
-                  <td>imperdiet</td>
-                  <td>Duis</td>
-                </tr>
-                <tr>
-                  <td>1,007</td>
-                  <td>sagittis</td>
-                  <td>ipsum</td>
-                  <td>Praesent</td>
-                  <td>mauris</td>
-                </tr>
-                <tr>
-                  <td>1,008</td>
-                  <td>Fusce</td>
-                  <td>nec</td>
-                  <td>tellus</td>
-                  <td>sed</td>
-                </tr>
-                <tr>
-                  <td>1,009</td>
-                  <td>augue</td>
-                  <td>semper</td>
-                  <td>porta</td>
-                  <td>Mauris</td>
-                </tr>
-                <tr>
-                  <td>1,010</td>
-                  <td>massa</td>
-                  <td>Vestibulum</td>
-                  <td>lacinia</td>
-                  <td>arcu</td>
-                </tr>
-                <tr>
-                  <td>1,011</td>
-                  <td>eget</td>
-                  <td>nulla</td>
-                  <td>Class</td>
-                  <td>aptent</td>
-                </tr>
-                <tr>
-                  <td>1,012</td>
-                  <td>taciti</td>
-                  <td>sociosqu</td>
-                  <td>ad</td>
-                  <td>litora</td>
-                </tr>
-                <tr>
-                  <td>1,013</td>
-                  <td>torquent</td>
-                  <td>per</td>
-                  <td>conubia</td>
-                  <td>nostra</td>
-                </tr>
-                <tr>
-                  <td>1,014</td>
-                  <td>per</td>
-                  <td>inceptos</td>
-                  <td>himenaeos</td>
-                  <td>Curabitur</td>
-                </tr>
-                <tr>
-                  <td>1,015</td>
-                  <td>sodales</td>
-                  <td>ligula</td>
-                  <td>in</td>
-                  <td>libero</td>
-                </tr>
+                
+
+                <?php } $ct++; } ?>
               </tbody>
             </table>
           </div>
