@@ -36,6 +36,7 @@
         google.charts.setOnLoadCallback(drawChart);
         google.charts.setOnLoadCallback(drawStuff);
         google.charts.setOnLoadCallback(drawChart2);
+        google.charts.setOnLoadCallback(mediaMovel);
 
         //Grafico principal
         function drawChart() {
@@ -59,7 +60,7 @@
             
             var options = {
                 title: 'Número de casos de covid19 na cidade de <?php echo $nomeCidade ?>',
-                legend: {position: 'right'}
+                legend: {position: 'none'}
             };
 
             var chart = new google.visualization.LineChart(document.getElementById('graficoLinha'));
@@ -86,18 +87,14 @@
           <?php } ?>
         ]);
 
-        var materialOptions = {
-          title: 'Número de casos de covid19 na cidade de <?php echo $nomeCidade ?>',
-          legend: {position: 'right'}
-        };
-
         var classicOptions = {
           //height: 650,
           series: {
             0: {targetAxisIndex: 0},
             1: {targetAxisIndex: 1}
           },
-          title: 'Nearby galaxies - distance on the left, brightness on the right'
+          title: 'Novos casos de covid19 em <?php echo $nomeCidade ?>',
+          legend: {position: 'none'}
         };
 
         function drawClassicChart() {
@@ -106,34 +103,68 @@
         }
 
         drawClassicChart();
-    };
-    function drawChart2() {
-            var data = google.visualization.arrayToDataTable([
-                ['Cidade', 'Casos'],
-                <?php
-                $sql = "SELECT * FROM dados_covid19 where city_ibge_code = ";
-                $sql .= (($passou) ? $valor : 3550308);
-                $buscar = mysqli_query($conexao,$sql);
+      };
+      function drawChart2() {
+        var data = google.visualization.arrayToDataTable([
+            ['Cidade', 'Casos'],
+            <?php
+            $sql = "SELECT * FROM dados_covid19 where city_ibge_code = ";
+            $sql .= (($passou) ? $valor : 3550308);
+            $buscar = mysqli_query($conexao,$sql);
 
-                while($dados = mysqli_fetch_array($buscar)){
-                    $cidade = explode("-",$dados["date"]);
-                    $casos = $dados['new_confirmed'];
-                    $nomeCidade = $dados['city'];
-                    $est = $dados['state'];
-                ?>
-                ['<?php echo $cidade[2];?>/<?php echo $cidade[1];?>', <?php echo $casos ?>],
+            while($dados = mysqli_fetch_array($buscar)){
+                $cidade = explode("-",$dados["date"]);
+                $casos = $dados['new_confirmed'];
+                $nomeCidade = $dados['city'];
+                $est = $dados['state'];
+            ?>
+            ['<?php echo $cidade[2];?>/<?php echo $cidade[1];?>', <?php echo $casos ?>],
 
-                <?php } ?>
-            ]);
-            
-            var options = {
-                title: 'Número de casos de covid19 na cidade de <?php echo $nomeCidade ?>',
-                legend: {position: 'right'}
-            };
+            <?php } ?>
+        ]);
+        
+        var options = {
+            title: 'Número de casos de covid19 na cidade de <?php echo $nomeCidade ?>',
+            legend: {position: 'none'}
+        };
 
-            var chart = new google.visualization.LineChart(document.getElementById('graficoLinha2'));
-            chart.draw(data, options);
-        }
+        var chart = new google.visualization.LineChart(document.getElementById('graficoLinha2'));
+        chart.draw(data, options);
+      }
+
+      function mediaMovel() {
+        // Some raw data (not necessarily accurate)
+        var data = google.visualization.arrayToDataTable([
+          ['Month', 'Novos Casos', 'Média móvel'],
+          //['2004/05',  165,      614.6],
+        <?php
+            //$sql = "SELECT `city`,`date`,`new_confirmed` FROM `dados_covid19` WHERE `city_ibge_code` = ";
+            $sql = "select t1.date, t1.new_confirmed, if(count(1)>=7,avg(t2.new_confirmed),0) as 'med_movel', t1.city from dados_covid19 t1 , dados_covid19 t2 where t1.city_ibge_code = '".$valor."' and t2.city_ibge_code = '".$valor."' and t2.date between DATE_SUB(date(t1.date),INTERVAL 6 day)+0 and t1.date and t1.date between 20200305 and 20200707 group by t1.date ,t1.new_confirmed order by date";
+            //$sql .= (($passou) ? $valor : 3550308);
+            $buscar = mysqli_query($conexao,$sql);
+
+            while($dados = mysqli_fetch_array($buscar)){
+                //$res = explode("-",$dados["date"]);
+                $ru = $dados["date"];
+          ?>
+        
+          ['<?php echo $ru;?>', <?php echo $dados["new_confirmed"]; ?>, <?php echo $dados["med_movel"]; ?>],
+        
+          <?php } ?>
+          ]);
+        var options = {
+          title : 'Monthly Coffee Production by Country',
+          //vAxis: {title: 'Cups'},
+          //hAxis: {title: 'Month'},
+          seriesType: 'bars',
+          series: {1: {type: 'line'}}
+        };
+
+        var chart = new google.visualization.ComboChart(document.getElementById('media_movel'));
+        chart.draw(data, options);
+      }
+
+
     </script>
   </head>
 
@@ -217,7 +248,7 @@
           </div> -->
           <div class="jumbotron">
               <!--<p>Introdução do artigo</p><br /><br /><br /><br /><br /><br /><br /><br /> -->
-              <center><div id="graficoLinha" style="width: 90%; height: 500px;"></div></center>
+              <center><div id="graficoLinha" style="width: 100%; height: 550px;"></div></center>
           </div>
           <p><b>Descrição:</b></p>
           <p>Neste gráfico, é possível visualizar... Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de casos confirmados de COVID19.</p>
@@ -241,7 +272,9 @@
 
           <div id="chart_div" style="width: 100%; height: 500px;"></div>
 
-          <div id="graficoLinha2" style="width: 90%; height: 500px;"></div>
+          <div id="graficoLinha2" style="width: 100%; height: 550px;"></div>
+
+          <div id="media_movel" style="width: 900px; height: 500px;"></div>
           
           <div class="row">
             <div class="jumbotron col-md-4 offset-md-1 bg-info text-white link-white">

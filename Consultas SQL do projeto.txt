@@ -24,3 +24,11 @@ UPDATE `dados_covid19` SET `city` = 'Pará' WHERE `place_type` = "state" AND `ci
 
 Selecionando 5 cidades aleatórias
 SELECT `cidade` FROM lista_cidade_estado ORDER BY RAND() LIMIT 5
+
+
+Média móvel
+select t1.date, t1.new_confirmed, if(count(1)>=7,avg(t2.new_confirmed),0) as 'med_movel', t1.city
+from dados_covid19 t1 , dados_covid19 t2
+where t1.city_ibge_code = 3509502 and t2.city_ibge_code = 3509502 and t2.date between DATE_SUB(date(t1.date),INTERVAL 6 day)+0 and t1.date and t1.date between 20200305 and 20200325
+group by t1.date ,t1.new_confirmed
+order by date
