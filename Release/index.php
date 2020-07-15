@@ -32,9 +32,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> <!-- do select -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> <!-- do gráfico -->
     <script type="text/javascript"> //do gráfico
-        google.charts.load('current', {'packages':['corechart']});
+        google.charts.load('current', {'packages':['corechart', 'bar']});
         google.charts.setOnLoadCallback(drawChart);
+        google.charts.setOnLoadCallback(drawStuff);
+        google.charts.setOnLoadCallback(drawChart2);
 
+        //Grafico principal
         function drawChart() {
             var data = google.visualization.arrayToDataTable([
                 ['Cidade', 'Casos'],
@@ -44,12 +47,12 @@
                 $buscar = mysqli_query($conexao,$sql);
 
                 while($dados = mysqli_fetch_array($buscar)){
-                    $cidade = $dados['date'];
+                    $cidade = explode("-",$dados["date"]);
                     $casos = $dados['last_available_confirmed'];
                     $nomeCidade = $dados['city'];
                     $est = $dados['state'];
                 ?>
-                ['<?php echo $cidade ?>', <?php echo $casos ?>],
+                ['<?php echo $cidade[2];?>/<?php echo $cidade[1];?>', <?php echo $casos ?>],
 
                 <?php } ?>
             ]);
@@ -60,6 +63,75 @@
             };
 
             var chart = new google.visualization.LineChart(document.getElementById('graficoLinha'));
+            chart.draw(data, options);
+        }
+
+        //Grafico secundário - top 10
+
+      function drawStuff() {
+
+        var chartDiv = document.getElementById('chart_div');
+
+        var data = google.visualization.arrayToDataTable([
+          ['Data', 'novos casos'],
+          <?php
+            $sql = "SELECT `city`,`date`,`new_confirmed` FROM `dados_covid19` WHERE `city_ibge_code` = ";
+            $sql .= (($passou) ? $valor : 3550308);
+            $buscar = mysqli_query($conexao,$sql);
+
+            while($dados = mysqli_fetch_array($buscar)){
+                $res = explode("-",$dados["date"]);
+          ?>
+          ['<?php echo $res[2];?>/<?php echo $res[1];?>', <?php echo $dados["new_confirmed"]; ?>],
+          <?php } ?>
+        ]);
+
+        var materialOptions = {
+          title: 'Número de casos de covid19 na cidade de <?php echo $nomeCidade ?>',
+          legend: {position: 'right'}
+        };
+
+        var classicOptions = {
+          //height: 650,
+          series: {
+            0: {targetAxisIndex: 0},
+            1: {targetAxisIndex: 1}
+          },
+          title: 'Nearby galaxies - distance on the left, brightness on the right'
+        };
+
+        function drawClassicChart() {
+          var classicChart = new google.visualization.ColumnChart(chartDiv);
+          classicChart.draw(data, classicOptions);
+        }
+
+        drawClassicChart();
+    };
+    function drawChart2() {
+            var data = google.visualization.arrayToDataTable([
+                ['Cidade', 'Casos'],
+                <?php
+                $sql = "SELECT * FROM dados_covid19 where city_ibge_code = ";
+                $sql .= (($passou) ? $valor : 3550308);
+                $buscar = mysqli_query($conexao,$sql);
+
+                while($dados = mysqli_fetch_array($buscar)){
+                    $cidade = explode("-",$dados["date"]);
+                    $casos = $dados['new_confirmed'];
+                    $nomeCidade = $dados['city'];
+                    $est = $dados['state'];
+                ?>
+                ['<?php echo $cidade[2];?>/<?php echo $cidade[1];?>', <?php echo $casos ?>],
+
+                <?php } ?>
+            ]);
+            
+            var options = {
+                title: 'Número de casos de covid19 na cidade de <?php echo $nomeCidade ?>',
+                legend: {position: 'right'}
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('graficoLinha2'));
             chart.draw(data, options);
         }
     </script>
@@ -166,6 +238,11 @@
               <option value="">Primeiro escolha um estado</option>
           </select>
           <br /><br />
+
+          <div id="chart_div" style="width: 100%; height: 500px;"></div>
+
+          <div id="graficoLinha2" style="width: 90%; height: 500px;"></div>
+          
           <div class="row">
             <div class="jumbotron col-md-4 offset-md-1 bg-info text-white link-white">
                 <p><b>Veja também - cidades do estado</b></p>
