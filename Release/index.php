@@ -328,6 +328,13 @@
               cellSettings: {
                   showLabel: false,
               },
+              paletteSettings: {
+                      palette: [
+                      { color: '#ffd072ff'},
+                      { color: '#D94B18'}
+                  ],
+                  type: "Gradient"
+              },
               xAxis: {
                 labels: [
                 <?php
@@ -396,6 +403,13 @@
               cellSettings: {
                   showLabel: false,
               },
+              paletteSettings: {
+                      palette: [
+                      { color: '#ffd072ff'},
+                      { color: '#D94B18'}
+                  ],
+                  type: "Gradient"
+              },
               xAxis: {
                 labels: [
                 <?php
@@ -421,6 +435,128 @@
           ele.style.visibility = "visible";
       }
           </script>
+
+          <div id="heatmapsemana">
+              <div id="elementsemana"></div>
+          </div>
+
+          <script type="text/javascript">
+            var heatmapData = [
+           //[73, 39, 26, 39, 94, 0],
+           //[93, 58, 53, 38, 26, 68],
+           <?php
+            //$sql = "SELECT `city`,`date`,`new_confirmed` FROM `dados_covid19` WHERE `city_ibge_code` = ";
+            $dias = array("domingo","segunda","terça","quarta","quinta","sexta","sábado");
+            $tabelas = array(
+              "retail_and_recreation_percent_change_from_baseline",
+              "grocery_and_pharmacy_percent_change_from_baseline",
+              "parks_percent_change_from_baseline",
+              "transit_stations_percent_change_from_baseline",
+              "workplaces_percent_change_from_baseline",
+              "residential_percent_change_from_baseline");
+            $sqlGeral = array();
+            
+            $cou2 = 0;
+            while ($cou2 < 7) { //7 dias da semana
+              $cou = 0;
+              $sql_dia = array();
+              while ($cou < 6) { //6 colunas da tabela
+                $sql_temp = "SELECT
+                        AVG(dd.`".$tabelas[$cou]."`) as mediana
+                      FROM (
+                      SELECT d.`".$tabelas[$cou]."`, @rownum:=@rownum+1 as `row_number`, @total_rows:=@rownum
+                        FROM `covid_mobilidade` d, (SELECT @rownum:=0) r
+                        WHERE d.`dia_semana` = '".$dias[$cou2]."' and d.`est` = '".$est."'  and d.`".$tabelas[$cou]."` is NOT NULL
+                        ORDER BY d.`".$tabelas[$cou]."`
+                      ) as dd WHERE dd.row_number IN ( FLOOR((@total_rows+1)/2), FLOOR((@total_rows+2)/2))";
+                array_push($sql_dia, $sql_temp);
+                $cou++;
+              }
+              array_push($sqlGeral, $sql_dia);
+                $cou2++;
+            }
+            
+            $arrayGeral = array();
+
+            $cou2 = 0;
+            while ($cou2 < 7) {
+              $cou = 0;
+              $medianas = array();
+              $sql_dia = $sqlGeral[$cou2];
+              while ($cou < 6) {
+                $buscar = mysqli_query($conexao,$sql_dia[$cou]);
+
+                while($dados = mysqli_fetch_array($buscar)){
+                  array_push($medianas, $dados["mediana"]);
+                }
+                $cou++;
+              }
+              array_push($arrayGeral, $medianas);
+              $cou2++;
+            }
+
+            $cou2 = 0;
+            while ($cou2 < 7) {
+              $cou = 0;
+              $medianas_domingo = $arrayGeral[$cou2];
+          ?>
+        
+              [
+              <?php
+                while ($cou < 6) {
+              ?>
+              [<?php echo $medianas_domingo[$cou++];?>],
+            
+              <?php } ?>], <?php  $cou2++; }?>
+              ];
+
+            var heatmap = new ej.heatmap.HeatMap({
+                 titleSettings: {
+                        text: 'Sales Revenue per Employee (in 1000 US$)',
+                        textStyle: {
+                            size: '15px',
+                            fontWeight: '500',
+                            fontStyle: 'Normal',
+                            fontFamily: 'Segoe UI'
+                        }
+                    },
+                    cellSettings: {
+                        showLabel: false,
+                    },
+                    xAxis: {
+                      labels: ['domingo','segunda','terça','quarta','quinta','sexta','sábado'],
+                    },
+                     /*paletteSettings: {
+                              palette: [
+                              { color: '#C06C84'},
+                              { color: '#6C5B7B'},
+                              { color: '#355C7D'}
+                          ],
+                          type: "Gradient"
+                      },*/
+                      paletteSettings: {
+                              palette: [
+                              { color: '#ffd072ff'},
+                              { color: '#D94B18'}
+                          ],
+                          type: "Gradient"
+                      },
+                    yAxis: {
+                        labels: ['Varejo','Merc/Farm','Parques','Est. Transp.','Trabalho','Residencias'],
+                    },
+                 dataSource: heatmapData, 
+            }, '#elementsemana');
+
+
+            var ele = document.getElementById('heatmapsemana');
+            if(ele) {
+                ele.style.visibility = "visible";
+            }
+          </script>
+
+          <?php
+          var_dump($arrayGeral);
+          ?>
 
           
           <div class="row">

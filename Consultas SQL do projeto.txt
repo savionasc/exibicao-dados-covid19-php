@@ -45,36 +45,14 @@ ORDER BY `covid_mobilidade`.`parks_percent_change_from_baseline` ASC
 Calcular a mediana
 SELECT
 (SELECT
-	AVG(dd.`retail_and_recreation_percent_change_from_baseline`) as median_val_resident
+	AVG(dd.`parks_percent_change_from_baseline`) as median_val_resident
 FROM (
-SELECT d.`retail_and_recreation_percent_change_from_baseline`, @rownum:=@rownum+1 as `row_number`, @total_rows:=@rownum
+SELECT d.`parks_percent_change_from_baseline`, @rownum:=@rownum+1 as `row_number`, @total_rows:=@rownum
   FROM `covid_mobilidade` d, (SELECT @rownum:=0) r
-  WHERE d.`dia_semana` = "segunda" and d.`sub_region_1` = "State of Ceará"  and d.`retail_and_recreation_percent_change_from_baseline` is NOT NULL
+  WHERE d.`dia_semana` = "segunda" and d.`sub_region_1` = "State of Ceará"  and d.`parks_percent_change_from_baseline` is NOT NULL
   -- put some where clause here
-  ORDER BY d.`retail_and_recreation_percent_change_from_baseline`
+  ORDER BY d.`parks_percent_change_from_baseline`
 ) as dd WHERE dd.row_number IN ( FLOOR((@total_rows+1)/2), FLOOR((@total_rows+2)/2) )) as mediana_retail
 
 from covid_mobilidade
-WHERE `dia_semana` = "segunda" and `sub_region_1` = "State of Ceará" limit 1) as "mediana_retail"
-
-
-
-
-
-
-OOOOUUUU esse: verificar se está certo mesmo
-
-SELECT
-	AVG(dd.`retail_and_recreation_percent_change_from_baseline`) as median_val_resident,
-    AVG(dd.`grocery_and_pharmacy_percent_change_from_baseline`) as median_val_resident2,
-    AVG(dd.`parks_percent_change_from_baseline`) as median_val_resident3,
-    AVG(dd.`transit_stations_percent_change_from_baseline`) as median_val_resident4,
-    AVG(dd.`workplaces_percent_change_from_baseline`) as median_val_resident5,
-    AVG(dd.`residential_percent_change_from_baseline`) as median_val_resident6
-FROM (
-SELECT d.`retail_and_recreation_percent_change_from_baseline`, `grocery_and_pharmacy_percent_change_from_baseline`, `parks_percent_change_from_baseline`,`transit_stations_percent_change_from_baseline`,`workplaces_percent_change_from_baseline`,`residential_percent_change_from_baseline`, @rownum:=@rownum+1 as `row_number`, @total_rows:=@rownum
-  FROM `covid_mobilidade` d, (SELECT @rownum:=0) r
-  WHERE d.`dia_semana` = "segunda" and d.`sub_region_1` = "State of Ceará"  and d.`retail_and_recreation_percent_change_from_baseline` is NOT NULL
-  -- put some where clause here
-  ORDER BY d.`retail_and_recreation_percent_change_from_baseline`
-) as dd WHERE dd.row_number IN ( FLOOR((@total_rows+1)/2), FLOOR((@total_rows+2)/2) )
+WHERE `dia_semana` = "segunda" and `sub_region_1` = "State of Ceará" limit 1
