@@ -29,6 +29,7 @@
 
     <!-- Custom styles for this template -->
     <link href="./bootstrap/dashboard.css" rel="stylesheet">
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js" type="text/javascript"></script> <!-- Heatmap -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> <!-- do select -->
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script> <!-- do gráfico -->
     <script type="text/javascript"> //do gráfico
@@ -164,7 +165,7 @@
         chart.draw(data, options);
       }
 
-
+      
     </script>
   </head>
 
@@ -275,6 +276,151 @@
           <div id="graficoLinha2" style="width: 100%; height: 550px;"></div>
 
           <div id="media_movel" style="width: 900px; height: 500px;"></div>
+
+          <div id="container2">
+              <div id="element2"></div>
+          </div>
+
+          <div id="container">
+              <div id="element"></div>
+          </div>
+          
+          <script type="text/javascript">
+            var heatmapData = [
+           //[73, 39, 26, 39, 94, 0],
+           //[93, 58, 53, 38, 26, 68],
+           <?php
+            //$sql = "SELECT `city`,`date`,`new_confirmed` FROM `dados_covid19` WHERE `city_ibge_code` = ";
+            $sql = "SELECT date,
+                    retail_and_recreation_percent_change_from_baseline,
+                    grocery_and_pharmacy_percent_change_from_baseline,
+                    parks_percent_change_from_baseline,
+                    transit_stations_percent_change_from_baseline,
+                    workplaces_percent_change_from_baseline,
+                    residential_percent_change_from_baseline FROM `covid_mobilidade` WHERE `sub_region_1` = 'State of Ceará' and ( date between 20200301 and 20200330)";
+            //$sql .= (($passou) ? $valor : 3550308);
+            $buscar = mysqli_query($conexao,$sql);
+
+            while($dados = mysqli_fetch_array($buscar)){
+          ?>
+        
+          [<?php echo $dados["retail_and_recreation_percent_change_from_baseline"];?>,
+          <?php echo $dados["grocery_and_pharmacy_percent_change_from_baseline"];?>,
+          <?php echo $dados["parks_percent_change_from_baseline"];?>,
+          <?php echo $dados["transit_stations_percent_change_from_baseline"];?>,
+          <?php echo $dados["workplaces_percent_change_from_baseline"];?>,
+          <?php echo $dados["residential_percent_change_from_baseline"];?>],
+        
+          <?php } ?>
+          ];
+
+      var heatmap = new ej.heatmap.HeatMap({
+           titleSettings: {
+                  text: 'Sales Revenue per Employee (in 1000 US$)',
+                  textStyle: {
+                      size: '15px',
+                      fontWeight: '500',
+                      fontStyle: 'Normal',
+                      fontFamily: 'Segoe UI'
+                  }
+              },
+              cellSettings: {
+                  showLabel: false,
+              },
+              xAxis: {
+                labels: [
+                <?php
+                  $sql = "SELECT date FROM `covid_mobilidade` WHERE `sub_region_1` = 'State of Ceará' and (date between 20200225 and 20200229 OR date between 20200301 and 20200324)";
+                  //$sql .= (($passou) ? $valor : 3550308);
+                  $buscar = mysqli_query($conexao,$sql);
+
+                  while($dados = mysqli_fetch_array($buscar)){
+                    $res = explode("-",$dados["date"]);
+                ?>
+                  '<?php echo $res[2];?>/<?php echo $res[1];?>',
+                <?php } ?>],
+              },
+              yAxis: {
+                  labels: ['Varejo','Merc/Farm','Parques','Est. Transp.','Trabalho','Residencias'],
+              },
+           dataSource: heatmapData, 
+      }, '#element2');
+
+
+      var ele = document.getElementById('container2');
+      if(ele) {
+          ele.style.visibility = "visible";
+      }
+          </script>
+
+          <script type="text/javascript">
+            var heatmapData = [
+           //[73, 39, 26, 39, 94, 0],
+           //[93, 58, 53, 38, 26, 68],
+           <?php
+            //$sql = "SELECT `city`,`date`,`new_confirmed` FROM `dados_covid19` WHERE `city_ibge_code` = ";
+            $sql = "SELECT date,
+                    retail_and_recreation_percent_change_from_baseline,
+                    grocery_and_pharmacy_percent_change_from_baseline,
+                    parks_percent_change_from_baseline,
+                    transit_stations_percent_change_from_baseline,
+                    workplaces_percent_change_from_baseline,
+                    residential_percent_change_from_baseline FROM `covid_mobilidade` WHERE `sub_region_1` = 'State of Ceará' and (date between 20200701 and 20200710 OR date between 20200608 and 20200630)";
+            //$sql .= (($passou) ? $valor : 3550308);
+            $buscar = mysqli_query($conexao,$sql);
+
+            while($dados = mysqli_fetch_array($buscar)){
+          ?>
+        
+          [<?php echo $dados["retail_and_recreation_percent_change_from_baseline"];?>,
+          <?php echo $dados["grocery_and_pharmacy_percent_change_from_baseline"];?>,
+          <?php echo $dados["parks_percent_change_from_baseline"];?>,
+          <?php echo $dados["transit_stations_percent_change_from_baseline"];?>,
+          <?php echo $dados["workplaces_percent_change_from_baseline"];?>,
+          <?php echo $dados["residential_percent_change_from_baseline"];?>],
+        
+          <?php } ?>
+          ];
+
+      var heatmap = new ej.heatmap.HeatMap({
+           titleSettings: {
+                  text: 'Sales Revenue per Employee (in 1000 US$)',
+                  textStyle: {
+                      size: '15px',
+                      fontWeight: '500',
+                      fontStyle: 'Normal',
+                      fontFamily: 'Segoe UI'
+                  }
+              },
+              cellSettings: {
+                  showLabel: false,
+              },
+              xAxis: {
+                labels: [
+                <?php
+                  $sql = "SELECT date FROM `covid_mobilidade` WHERE `sub_region_1` = 'State of Ceará' and (date between 20200701 and 20200710 OR date between 20200608 and 20200630)";
+                  //$sql .= (($passou) ? $valor : 3550308);
+                  $buscar = mysqli_query($conexao,$sql);
+
+                  while($dados = mysqli_fetch_array($buscar)){
+                    $res = explode("-",$dados["date"]);
+                ?>
+                  '<?php echo $res[2];?>/<?php echo $res[1];?>',
+                <?php } ?>],
+              },
+              yAxis: {
+                  labels: ['Varejo','Merc/Farm','Parques','Est. Transp.','Trabalho','Residencias'],
+              },
+           dataSource: heatmapData, 
+      }, '#element');
+
+
+      var ele = document.getElementById('container');
+      if(ele) {
+          ele.style.visibility = "visible";
+      }
+          </script>
+
           
           <div class="row">
             <div class="jumbotron col-md-4 offset-md-1 bg-info text-white link-white">
