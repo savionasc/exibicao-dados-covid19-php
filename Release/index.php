@@ -553,11 +553,6 @@
                 ele.style.visibility = "visible";
             }
           </script>
-
-          <?php
-          var_dump($arrayGeral);
-          ?>
-
           
           <div class="row">
             <div class="jumbotron col-md-4 offset-md-1 bg-info text-white link-white">
