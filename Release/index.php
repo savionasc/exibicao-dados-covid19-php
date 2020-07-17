@@ -39,6 +39,8 @@
         google.charts.setOnLoadCallback(drawStuff);
         google.charts.setOnLoadCallback(drawChart2);
         google.charts.setOnLoadCallback(mediaMovel);
+        google.charts.setOnLoadCallback(scatter);
+        
 
         //Grafico principal
         function drawChart() {
@@ -61,7 +63,7 @@
             ]);
             
             var options = {
-                title: 'Número de casos de covid19 na cidade de <?php echo $nomeCidade ?>',
+                title: 'Número de casos acumulados de covid19 na cidade de <?php echo $nomeCidade ?>',
                 legend: {position: 'none'}
             };
 
@@ -155,7 +157,7 @@
           <?php } ?>
           ]);
         var options = {
-          title : 'Monthly Coffee Production by Country',
+          title : 'Gráfico de novos casos com média móvel do estado de São Paulo',
           //vAxis: {title: 'Cups'},
           //hAxis: {title: 'Month'},
           seriesType: 'bars',
@@ -166,6 +168,45 @@
         chart.draw(data, options);
       }
 
+      function scatter() {
+        var data = google.visualization.arrayToDataTable([
+          ['Age', 'Weight'],
+          <?php
+            $sql = "SELECT `new_confirmed` FROM `dados_covid19` WHERE `place_type` = 'state' and `state` = '".$est."' and (date between 20200415 and 20200428) order by date asc";
+            $buscar = mysqli_query($conexao,$sql);
+
+            $novos_casos = array();
+
+            while($dados = mysqli_fetch_array($buscar)){
+              array_push($novos_casos, $dados["new_confirmed"]);
+            }
+
+            $sql = "SELECT `residential_percent_change_from_baseline` FROM `covid_mobilidade` WHERE `est` = '".$est."' and (date between 20200415 and 20200428) order by date asc";
+            $buscar = mysqli_query($conexao,$sql);
+
+            $mobilidade = array();
+
+            while($dados = mysqli_fetch_array($buscar)){
+              array_push($mobilidade, $dados["residential_percent_change_from_baseline"]);
+            }
+
+            for($i = 0; $i < count($mobilidade); ++$i) {
+          ?>
+          [<?php echo $mobilidade[$i];?>,<?php echo $novos_casos[$i];?>],
+          <?php } ?>
+        ]);
+
+        var options = {
+          title: 'Age vs. Weight comparison',
+          hAxis: {title: 'Age', minValue: -30, maxValue: 30},
+          vAxis: {title: 'Weight', minValue: 0, maxValue: 15},
+          legend: 'none'
+        };
+
+        var chart = new google.visualization.ScatterChart(document.getElementById('scatter'));
+
+        chart.draw(data, options);
+      }
       
     </script>
   </head>
@@ -189,7 +230,7 @@
               <li class="nav-item">
                 <a class="nav-link" href="#inicio">
                   <span data-feather="home"></span>
-                  Inicio <span class="sr-only">(current)</span>
+                  Início <span class="sr-only">(current)</span>
                 </a>
               </li>
               <!--<li class="nav-item">
@@ -199,20 +240,20 @@
                 </a>
               </li>-->
               <li class="nav-item">
-                <a class="nav-link" href="#">
+                <a class="nav-link" href="#chart_div">
                   <span data-feather="bar-chart-2"></span>
-                  Graficos
+                  Gráficos
                 </a>
               </li>
-              <!--<li class="nav-item">
-                <a class="nav-link" href="#">
+              <li class="nav-item">
+                <a class="nav-link" href="#table-responsive">
                   <span data-feather="layers"></span>
-                  Integrations
+                  Tabela
                 </a>
-              </li>-->
+              </li>
             </ul>
 
-            <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+            <!--<h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
               <span>Saved reports</span>
               <a class="d-flex align-items-center text-muted" href="#">
                 <span data-feather="plus-circle"></span>
@@ -225,13 +266,13 @@
                   Current month
                 </a>
               </li>
-            </ul>
+            </ul>-->
           </div>
         </nav>
 
         <main role="main" id="inicio" class="col-md-9 ml-sm-auto col-lg-10 pt-3 px-4">
           <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
-            <h1 class="h2">Inicio</h1>
+            <h1 class="h2">Início</h1>
             <!--<div class="btn-toolbar mb-2 mb-md-0">
                <div class="btn-group mr-2">
                 <button class="btn btn-sm btn-outline-secondary">Share</button>
@@ -251,9 +292,9 @@
           <div class="jumbotron">
               <!--<p>Introdução do artigo</p><br /><br /><br /><br /><br /><br /><br /><br /> -->
               <center><div id="graficoLinha" style="width: 100%; height: 550px;"></div></center>
+              <p><b>Descrição:</b></p>
+              <p>Neste gráfico, é possível visualizar os casos acumulados até cada dia da cidade. Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o acumulado de casos confirmados de COVID19.</p>
           </div>
-          <p><b>Descrição:</b></p>
-          <p>Neste gráfico, é possível visualizar... Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de casos confirmados de COVID19.</p>
           <select id="estado">
               <option value="">Selecione o estado</option>
                 <?php 
@@ -273,11 +314,20 @@
           <br /><br />
 
           <div id="chart_div" style="width: 100%; height: 500px;"></div>
-
+          <p><b>Descrição (gráfico de barras):</b></p>
+          <p>Gráfico de visualização dos novos casos de coronavírus por dia naquela cidade. Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de novos casos confirmados de COVID19.</p>
           <div id="graficoLinha2" style="width: 100%; height: 550px;"></div>
+          <p><b>Descrição (gráfico de linha):</b></p>
+          <p>Gráfico de visualização dos novos casos de coronavírus por dia naquela cidade. Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de novos casos confirmados de COVID19.</p>
 
           <div id="media_movel" style="width: 900px; height: 500px;"></div>
+          <p><b>Descrição (gráfico de barras com linha):</b></p>
+          <p>Gráfico de visualização dos novos casos de coronavírus por dia naquela cidade juntamente com a visualização da média móvel representada no gráfico de linha. Na horizontal (eixo X) se vê os dias e na vertical (eixo Y) se vê o número de novos casos confirmados de COVID19.</p>
 
+          <hr>
+          <h3>Dados do estado - <?php echo $est;?></h3>
+          <p><b>Mapas de calor:</b></p>
+          <p>A seguir encontra-se 3 mapas de calor baseados em dados de mobilidade. O primeiro mapa refere-se ao inicio da pandemia, o segundo aos últimos 30 dias no dataset e por último um mapa de calor referente aos dias da semana.</p>
           <div id="container2">
               <div id="element2"></div>
           </div>
@@ -317,7 +367,7 @@
 
       var heatmap = new ej.heatmap.HeatMap({
            titleSettings: {
-                  text: 'Sales Revenue per Employee (in 1000 US$)',
+                  text: 'Frequência de ida aos locais no período de 30 dias (em porcentagem de -100% a 100%) - início da quarentena',
                   textStyle: {
                       size: '15px',
                       fontWeight: '500',
@@ -392,7 +442,7 @@
 
       var heatmap = new ej.heatmap.HeatMap({
            titleSettings: {
-                  text: 'Sales Revenue per Employee (in 1000 US$)',
+                  text: 'Frequência de ida aos locais no período de 30 dias (em porcentagem de -100% a 100%) - atualmente na quarentena',
                   textStyle: {
                       size: '15px',
                       fontWeight: '500',
@@ -512,7 +562,7 @@
 
             var heatmap = new ej.heatmap.HeatMap({
                  titleSettings: {
-                        text: 'Sales Revenue per Employee (in 1000 US$)',
+                        text: 'Frequência de ida aos locais por dia da semana (em porcentagem de -100% a 100%) - toda a quarentena',
                         textStyle: {
                             size: '15px',
                             fontWeight: '500',
@@ -553,6 +603,10 @@
                 ele.style.visibility = "visible";
             }
           </script>
+          <p><b>Descrição (gráfico de pontos):</b></p>
+          <p>Gráfico de visualização dos novos casos de coronavírus por dia com os dados de mobilidade naquela cidade. Na horizontal (eixo X) se vê variações da mobilidade e na vertical (eixo Y) se vê o número de novos casos confirmados de COVID19.</p>
+
+          <div id="scatter" style="width: 900px; height: 500px;"></div>
           
           <div class="row">
             <div class="jumbotron col-md-4 offset-md-1 bg-info text-white link-white">
@@ -592,7 +646,7 @@
           </ul> -->
          
           <h2 id="secao2">Cidades com mais casos do estado</h2>
-          <div class="table-responsive">
+          <div class="table-responsive" id="table-responsive">
             <table class="table table-striped table-sm">
               <thead>
                 <tr>
